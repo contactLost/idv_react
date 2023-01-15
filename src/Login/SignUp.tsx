@@ -9,9 +9,8 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { useNavigate } from "react-router-dom";
 import * as AxiosConfig from "../AxiosConfig.js";
-import Cookies from 'universal-cookie';
 
-export default function SignIn() {
+export default function SignUp() {
 
     const navigate = useNavigate();
     const [error, setError] = useState(false);
@@ -19,30 +18,14 @@ export default function SignIn() {
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        const cookies = new Cookies()
 
-        AxiosConfig.default.post("/auth/login",
+        AxiosConfig.default.post("/user/createUser",
             {
                 "userName": data.get("username"),
                 "password": data.get("password")
             }).then((response) => {
-
-                //console.log("Login Successful. Fetching user data...")
-                //console.log(response.data["token"])
-                cookies.set("token", response.data["token"], { path: '/' })
-                //sessionStorage.setItem("token", response.data["token"])
-
-                AxiosConfig.default.get("/auth/userinfo")
-                    .then(resp => {
-                        sessionStorage.setItem("userinfo", JSON.stringify( resp.data))
-                        navigate("items")
-                    })
-                    .catch(reason => {
-                        console.log("Something went wrong", reason)
-                    })
-
+                navigate("/")
             }).catch(reason => {
-                console.log("User auth failed.")
                 setError(true)
             })
 
@@ -63,7 +46,7 @@ export default function SignIn() {
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    Sign in
+                    Create Account
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
                     <TextField
@@ -92,17 +75,9 @@ export default function SignIn() {
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
                     >
-                        Sign In
+                        Sign Up
                     </Button>
-                </Box>{error ? "Bad Credentials" : null}
-                <Button
-                    fullWidth
-                    variant="outlined"
-                    sx={{ mt: 3, mb: 2 }}
-                    onClick={() => { navigate("sign-up")}}
-                >
-                    Sign Up
-                </Button>
+                </Box>{error ? "Sign Up Failed. This username is already taken" : null}
             </Box>
         </Container>
     );
